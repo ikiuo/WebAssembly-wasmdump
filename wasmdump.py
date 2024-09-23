@@ -1071,7 +1071,7 @@ def element_section(section):
         else:
             if mode & 3:
                 kind = section.byte()
-                if kind != 0:
+                if int(kind) != 0:
                     raise NotImplementedError(f'unknown elemkind: {int(kind)}')
                 dprint(kind.data, f'{indent}funcref')
             exprs = section.leb128u()
