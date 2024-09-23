@@ -1070,10 +1070,11 @@ def element_section(section):
                 expression(section, 2)
         else:
             if mode & 3:
-                kind = section.byte()
-                if int(kind) != 0:
-                    raise NotImplementedError(f'unknown elemkind: {int(kind)}')
-                dprint(kind.data, f'{indent}funcref')
+                elemkind = section.byte()
+                kind = int(elemkind)
+                if kind != 0:
+                    raise NotImplementedError(f'unknown elemkind: {kind}')
+                dprint(elemkind.data, f'{indent}funcref')
             exprs = section.leb128u()
             count = int(exprs)
             dprint(exprs.data, f'{indent}funcidx count = {count}')
