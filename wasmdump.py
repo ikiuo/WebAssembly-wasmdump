@@ -1120,7 +1120,7 @@ def data_section(section):
             raise NotImplementedError(f'unknown data: mode={mode}')
         if mode == 2:
             memidx = section.leb128u()
-            dprint(memidx.code, f'{indent}memidx = {int(memidx)}')
+            dprint(memidx.data, f'{indent}memidx = {int(memidx)}')
         if mode in (0, 2):
             expression(section, 1)
         bsz = section.leb128u()
