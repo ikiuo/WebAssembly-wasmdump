@@ -1131,7 +1131,7 @@ def data_section(section):
 
 
 def datacount_section(section):
-    count = section.long()
+    count = section.leb128u()
     dprint(count.data, f'data count = {int(count)}')
     section_remain(section)
 
