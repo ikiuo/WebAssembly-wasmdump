@@ -1059,7 +1059,7 @@ def element_section(section):
             tabidx = section.leb128u()
             dprint(tabidx.data, f'{indent}tableidx = {int(tabidx)}')
         if not mode & 1:
-            dprint(None, f'{indent}expr')
+            dprint(None, f'{indent}offset')
             expression(section, 2)
         if mode & 4:
             if mode & 3:
@@ -1067,9 +1067,9 @@ def element_section(section):
                 dprint(cvt.data, f'{indent}{str(cvt)}')
             exprs = section.leb128u()
             count = int(exprs)
-            dprint(exprs.data, f'{indent}expr count = {count}')
+            dprint(exprs.data, f'{indent}init count = {count}')
             for idx in range(count):
-                dprint(None, f'{indent}expr[{idx}]')
+                dprint(None, f'{indent}init[{idx}]')
                 expression(section, 2)
         else:
             if mode & 3:
@@ -1105,7 +1105,8 @@ def code_section(section):
             dprint(tcnt.data, f'{indent}  type count = {int(tcnt)}')
             cvt = read_valtype(code)
             dprint(cvt.data, f'{indent}  type = {str(cvt)}')
-        expression(code, 1)
+        dprint(None, f'{indent}code expr')
+        expression(code, 2)
         section_remain(code)
     section_remain(section)
 
@@ -1118,14 +1119,16 @@ def data_section(section):
     for idx in range(vlen):
         code = section.leb128u()
         mode = int(code)
-        dprint(code.data, f'data[{idx}] (mode={mode})')
         if mode >= 3:
             raise NotImplementedError(f'unknown data: mode={mode}')
+        kind = ('active,memidx=0', 'passive', 'active')[mode]
+        dprint(code.data, f'data[{idx}] (mode[{mode}]:{kind})')
         if mode == 2:
             memidx = section.leb128u()
             dprint(memidx.data, f'{indent}memidx = {int(memidx)}')
         if mode in (0, 2):
-            expression(section, 1)
+            dprint(None, f'{indent}offset')
+            expression(section, 2)
         bsz = section.leb128u()
         dprint(bsz.data, f'{indent}init size = {int(bsz)}')
         bdt = section.load(int(bsz))
