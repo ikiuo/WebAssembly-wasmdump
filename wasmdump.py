@@ -822,8 +822,11 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
                 f' {asm[0]} -> 0x{op:02x}'
             )
 
+        if op in {'i32', 'i64'}:
+            code = stream.leb128s()
+            dprint(code.data, indent + str(int(code)))
+            continue
         if op in {
-                'i32', 'i64',
                 'did', 'eid', 'fid', 'gid', 'lid', 'mid',
                 'tid', 'tid1', 'tid2',
                 'xid',
