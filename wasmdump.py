@@ -854,7 +854,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
 
         if op == 'mao':
             code = stream.leb128u()
-            dprint(code.data, f'{indent}align = {int(code)}')
+            dprint(code.data, f'{indent}align = {int(code)} ({1 << int(code)})')
             code = stream.leb128u()
             dprint(code.data, f'{indent}offset = {int(code)}')
             continue
