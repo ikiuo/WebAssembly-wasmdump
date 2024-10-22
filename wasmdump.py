@@ -883,7 +883,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             dprint(leb128.data, f'{indent}(types={count})')
             for _ in range(count):
                 lid = stream.leb128u()
-                dprint(lid.data, f'{indent}{str(lid)}')
+                dprint(lid.data, f'{indent}{int(lid)}')
             continue
         if op == 'ref':
             crt = read_reftype(stream)
@@ -1189,8 +1189,12 @@ def main():
 
     args = parser.parse_args()
     path = args.file
-    with open(path, 'rb') as fp:
-        data = fp.read()
+
+    if path == '-':
+        data = sys.stdin.buffer.read()
+    else:
+        with open(path, 'rb') as fp:
+            data = fp.read()
     file = ReadData(path, data, 0)
 
     fposw = len(f'{len(file) - 1:x}')
