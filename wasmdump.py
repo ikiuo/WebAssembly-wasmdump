@@ -880,7 +880,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             leb128 = stream.leb128u()
             count = int(leb128)
             dprint(leb128.data, f'{indent}(types={count})')
-            for _ in range(count):
+            for _ in range(count + 1):
                 lid = stream.leb128u()
                 dprint(lid.data, f'{indent}{int(lid)}')
             continue
