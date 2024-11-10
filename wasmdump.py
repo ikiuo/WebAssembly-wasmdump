@@ -778,6 +778,23 @@ DISASM = [
 ]
 
 
+OPERAND_INDEX = {
+    'did': 'dataidx',
+    'eid': 'elemidx',
+    'fid': 'funcidx',
+    'gid': 'globalidx',
+    'lid': 'localidx',
+    'sid': 'labelidx',
+    'xid': 'typeidx',
+    'mid': 'memidx',
+    'mid1': 'memidx',
+    'mid2': 'memidx',
+    'tid': 'tableidx',
+    'tid1': 'tableidx',
+    'tid2': 'tableidx',
+}
+
+
 def read_valtype(stream):
     code = stream.byte()
     return String(get_valtype(int(code)), code.data)
@@ -825,13 +842,10 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             code = stream.leb128s()
             dprint(code.data, indent + str(int(code)))
             continue
-        if op in {
-                'did', 'eid', 'fid', 'gid', 'lid', 'sid', 'xid',
-                'mid', 'mid1', 'mid2',
-                'tid', 'tid1', 'tid2',
-        }:
+        idx = OPERAND_INDEX.get(op)
+        if idx:
             code = stream.leb128u()
-            dprint(code.data, indent + str(int(code)))
+            dprint(code.data, f'{indent}{idx} = {int(code)}')
             continue
         if op == 'f32':
             code = stream.load(4)
@@ -864,7 +878,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             if cbt & 0x40:
                 sbt = '(empty)' if cbt == 0x40 else get_valtype(cbt)
             else:
-                sbt = str(decode_leb128s(leb128.data))
+                sbt = f'blocktype = {decode_leb128s(leb128.data)}'
             dprint(leb128, indent + sbt)
             continue
 
