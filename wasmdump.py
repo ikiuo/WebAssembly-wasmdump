@@ -842,7 +842,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             dprint(code, indent + str(unpack('<d', code.data)[0]))
             continue
 
-        if op in ('vb16', 'vlt'):
+        if op in ('vi08', 'vlt'):
             code = stream.load(16)
             dprint(code, indent + ' '.join(f'0x{b:02x}' for b in code.data))
             continue
