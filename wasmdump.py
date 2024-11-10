@@ -257,17 +257,17 @@ DISASM = [
     [[], ['else']],
     [], [], [], [], [],
     [[], ['end']],
-    [['lid'], ['br', 'lid']],
-    [['lid'], ['br_if', 'lid']],
-    [['lid+'], ['br_table', 'lid+']],
+    [['sid'], ['br', 'sid']],
+    [['sid'], ['br_if', 'sid']],
+    [['sid+'], ['br_table', 'sid+']],
     [[], ['return']],
     # 0x10
     [['fid'], ['call', 'fid']],
-    [['xid', 'tid'], ['call_indirect', 'xid', 'tid']],
+    [['xid', 'tid'], ['call_indirect', 'tid', 'xid']],
     [], [], [], [], [], [], [], [],
     [[], ['drop']],
     [[], ['select']],
-    [['t+'], ['select', 't+']],
+    [['vt+'], ['select', 'vt+']],
     [], [], [],
     # 0x20
     [['lid'], ['local.get', 'lid']],
@@ -465,12 +465,12 @@ DISASM = [
         [[], ['i64.trunc_sat_f32_u']],
         [[], ['i64.trunc_sat_f64_s']],
         [[], ['i64.trunc_sat_f64_u']],
-        [['eid', 0], ['memory.init', 'eid']],
+        [['did', 0], ['memory.init', 'did']],
         [['did'], ['data.drop', 'did']],
         [[0, 0], ['memory.copy']],
         [[0], ['memory.fill']],
-        [['eid', 'tid'], ['table.init', 'eid', 'tid']],
-        [['mid'], ['elem.drop', 'mid']],
+        [['eid', 'tid'], ['table.init', 'tid', 'eid']],
+        [['eid'], ['elem.drop', 'eid']],
         [['tid1', 'tid2'], ['table.copy', 'tid1', 'tid2']],
         [['tid'], ['table.grow', 'tid']],
         # 0x10
@@ -520,7 +520,7 @@ DISASM = [
         [['mao'], ['v128.load32_splat', 'mao']],
         [['mao'], ['v128.load64_splat', 'mao']],
         [['mao'], ['v128.store', 'mao']],
-        [['vb16'], ['v128.const', 'vb16']],
+        [['vi08'], ['v128.const', 'vi08']],
         [['vlt'], ['i8x16.shuffle', 'vlt']],
         [[], ['i8x16.swizzle']],
         [[], ['i8x16.splat']],
@@ -597,14 +597,14 @@ DISASM = [
         [[], ['v128.xor']],
         [[], ['v128.bitselect']],
         [[], ['v128.any_true']],
-        [['mao', 'vl'], ['v128.load8_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.load16_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.load32_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.load64_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.store8_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.store16_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.store32_lane', 'mao', 'vl']],
-        [['mao', 'vl'], ['v128.store64_lane', 'mao', 'vl']],
+        [['mao', 'vl'], ['v128.load8_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.load16_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.load32_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.load64_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.store8_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.store16_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.store32_lane', 'vl', 'mao']],
+        [['mao', 'vl'], ['v128.store64_lane', 'vl', 'mao']],
         [['mao'], ['v128.load32_zero', 'mao']],
         [['mao'], ['v128.load64_zero', 'mao']],
         [[], ['f32x4.demote_f64x2_zero']],
@@ -826,9 +826,9 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             dprint(code.data, indent + str(int(code)))
             continue
         if op in {
-                'did', 'eid', 'fid', 'gid', 'lid', 'mid',
+                'did', 'eid', 'fid', 'gid', 'lid', 'sid', 'xid',
+                'mid', 'mid1', 'mid2',
                 'tid', 'tid1', 'tid2',
-                'xid',
         }:
             code = stream.leb128u()
             dprint(code.data, indent + str(int(code)))
@@ -868,7 +868,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
             dprint(leb128, indent + sbt)
             continue
 
-        if op == 't+':
+        if op == 'vt+':
             leb128 = stream.leb128u()
             count = int(leb128)
             dprint(leb128.data, f'{indent}(types={count})')
@@ -876,7 +876,7 @@ def instruction(stream, indent_base=0, indent_level=0, indent_step=2):
                 cvt = read_valtype(stream)
                 dprint(cvt.data, f'{indent}{str(cvt)}')
             continue
-        if op == 'lid+':
+        if op == 'sid+':
             leb128 = stream.leb128u()
             count = int(leb128)
             dprint(leb128.data, f'{indent}(types={count})')
